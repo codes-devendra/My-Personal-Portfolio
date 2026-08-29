@@ -1,0 +1,10 @@
+{
+  "name": "Personal Portfolio & Website",
+  "description": "A modern, interactive personal portfolio website showcasing projects, skills, experience, Google Forms intake, and real-time Gemini Live voice conversations.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

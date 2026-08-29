@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global deny-all default catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Portfolio profile configuration singleton
+    match /portfolio/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Contact messages (public create with strict validation, only authenticated portfolio owner can read/manage)
+    match /messages/{messageId} {
+      allow create: if isValidId(messageId)
+        && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+        && incoming().email is string && incoming().email.size() > 0 && incoming().email.size() <= 100
+        && incoming().message is string && incoming().message.size() > 0 && incoming().message.size() <= 3000;
+      allow read, update, delete: if isSignedIn();
+    }
+
+    // Public guestbook notes (public read, authenticated create)
+    match /guestbook/{entryId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && isValidId(entryId)
+        && incoming().userId == request.auth.uid
+        && incoming().userName is string && incoming().userName.size() > 0 && incoming().userName.size() <= 100
+        && incoming().message is string && incoming().message.size() > 0 && incoming().message.size() <= 500;
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid);
+      allow update: if false;
+    }
+  }
+}
