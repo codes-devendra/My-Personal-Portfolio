@@ -63,10 +63,13 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
         {/* Project Image Banner */}
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-black border-b border-[#27272a]">
           <img
-            src={project.image}
+            src={project.image?.trim() || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop'}
             alt={project.title}
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop';
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-black/50 to-transparent" />
           

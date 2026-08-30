@@ -97,10 +97,13 @@ export const Projects: React.FC<ProjectsProps> = ({ projects, accent, themeMode 
                 onClick={() => setSelectedProject(project)}
               >
                 <img
-                  src={project.image}
+                  src={project.image?.trim() || 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop'}
                   alt={project.title}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#111111] via-transparent to-transparent opacity-80 group-hover:opacity-50 transition-opacity" />
                 

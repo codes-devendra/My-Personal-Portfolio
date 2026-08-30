@@ -16,12 +16,15 @@ import { Guestbook } from './components/Guestbook';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { LiveEditorModal } from './components/LiveEditorModal';
+import { AuthModal, AuthTab } from './components/AuthModal';
 import { 
   initialProfile, initialProjects, initialSkills, 
   initialExperience, initialServices, initialTestimonials, initialArticles 
 } from './data/initialData';
 import { ProfileData, Project, SkillCategory, Experience as ExperienceType, Service, Testimonial, Article, AccentColor, ThemeMode } from './types';
-import { db, doc, onSnapshot, setDoc, handleFirestoreError, OperationType } from './lib/firebase';
+import { db, doc, onSnapshot, setDoc, auth, onAuthStateChanged, signOut, User } from './lib/firebase';
+
+const OWNER_EMAIL = 'shobhasolanki230@gmail.com';
 
 export default function App() {
   const [profile, setProfile] = useState<ProfileData>(() => {
@@ -60,7 +63,31 @@ export default function App() {
 
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<AuthTab>('user_login');
   const [prefilledService, setPrefilledService] = useState<string | undefined>(undefined);
+
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isOwner, setIsOwner] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('portfolio_owner_unlocked') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // Track Firebase Auth State
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (user?.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()) {
+        setIsOwner(true);
+        sessionStorage.setItem('portfolio_owner_unlocked', 'true');
+      }
+    });
+    return () => unsub();
+  }, []);
 
   // Sync profile with Firestore if remote exists
   useEffect(() => {
@@ -136,6 +163,21 @@ export default function App() {
     setPrefilledService(serviceTitle);
   };
 
+  const handleOpenAuth = (tab: AuthTab = 'user_login') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      setIsOwner(false);
+      sessionStorage.removeItem('portfolio_owner_unlocked');
+    } catch (err) {
+      console.error('Error signing out:', err);
+    }
+  };
+
   return (
     <div className={`min-h-screen transition-colors duration-200 ${
       themeMode === 'light' 
@@ -151,6 +193,10 @@ export default function App() {
         setThemeMode={handleSetThemeMode}
         onOpenCustomizer={() => setIsCustomizerOpen(true)}
         onOpenVoiceAssistant={() => setIsVoiceModalOpen(true)}
+        currentUser={currentUser}
+        isOwner={isOwner}
+        onOpenAuth={handleOpenAuth}
+        onSignOut={handleSignOut}
       />
 
       {/* Main Content Sections */}
@@ -277,6 +323,20 @@ export default function App() {
         setAccent={handleSetAccent}
         themeMode={themeMode}
         setThemeMode={handleSetThemeMode}
+      />
+
+      {/* Dedicated Login / Owner Login / Sign Up Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        isOwner={isOwner}
+        onOwnerStatusChange={setIsOwner}
+        accent={accent}
+        themeMode={themeMode}
+        profile={profile}
+        onOpenCustomizer={() => setIsCustomizerOpen(true)}
+        initialTab={authModalTab}
       />
     </div>
   );

@@ -178,9 +178,9 @@ export const GoogleFormsSection: React.FC<GoogleFormsSectionProps> = ({ themeMod
           <div>
             {hasToken && currentUser ? (
               <div className="flex items-center gap-3 p-2 pl-3 rounded-full bg-[#111111] border border-[#27272a]">
-                {currentUser.photoURL ? (
+                {currentUser.photoURL && currentUser.photoURL.trim() !== '' ? (
                   <img 
-                    src={currentUser.photoURL} 
+                    src={currentUser.photoURL.trim()} 
                     alt={currentUser.displayName || 'Google User'} 
                     className="w-7 h-7 rounded-full border border-[#27272a]"
                     referrerPolicy="no-referrer"

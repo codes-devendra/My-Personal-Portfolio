@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Menu, X, Sparkles, Sliders, Moon, Sun, Monitor, 
-  ExternalLink, Mail, Check, Github, Linkedin, Twitter, ArrowUpRight, Mic
+  Menu, X, Sparkles, Sliders, Moon, Sun, 
+  Check, ArrowUpRight, Mic, User, LogIn, Shield, LogOut, KeyRound, ChevronDown
 } from 'lucide-react';
 import { ProfileData, AccentColor, ThemeMode } from '../types';
 import { accentThemes } from '../utils/theme';
+import { User as FirebaseUser } from '../lib/firebase';
+import { AuthTab } from './AuthModal';
 
 interface NavbarProps {
   profile: ProfileData;
@@ -15,6 +17,10 @@ interface NavbarProps {
   onOpenCustomizer: () => void;
   onOpenVoiceAssistant?: () => void;
   onSelectProject?: (id: string) => void;
+  currentUser: FirebaseUser | null;
+  isOwner: boolean;
+  onOpenAuth: (tab?: AuthTab) => void;
+  onSignOut: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -24,11 +30,16 @@ export const Navbar: React.FC<NavbarProps> = ({
   themeMode,
   setThemeMode,
   onOpenCustomizer,
-  onOpenVoiceAssistant
+  onOpenVoiceAssistant,
+  currentUser,
+  isOwner,
+  onOpenAuth,
+  onSignOut
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const themeConfig = accentThemes[accent];
 
@@ -63,9 +74,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         isScrolled 
           ? themeMode === 'light' 
-            ? 'bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs py-3.5' 
-            : 'bg-[#050505]/90 backdrop-blur-md border-b border-[#27272a] shadow-xs py-3.5'
-          : 'bg-transparent py-5'
+            ? 'bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs py-3' 
+            : 'bg-[#050505]/90 backdrop-blur-md border-b border-[#27272a] shadow-xs py-3'
+          : 'bg-transparent py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,29 +85,29 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a 
             id="nav-logo-link"
             href="#hero" 
-            className="flex items-center gap-3 group focus:outline-hidden"
+            className="flex items-center gap-2.5 group focus:outline-hidden"
           >
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm transition-transform group-hover:scale-105 shadow-sm bg-gradient-to-tr ${themeConfig.gradient} text-white`}>
               {profile.name.charAt(0)}
             </div>
             <div className="flex flex-col">
-              <span className={`font-display font-extrabold text-base tracking-tight ${themeMode === 'light' ? 'text-zinc-900' : 'text-white'}`}>
+              <span className={`font-display font-extrabold text-sm sm:text-base tracking-tight ${themeMode === 'light' ? 'text-zinc-900' : 'text-white'}`}>
                 {profile.name.toUpperCase()}
               </span>
-              <span className={`text-[11px] font-mono hidden sm:inline-block ${themeMode === 'light' ? 'text-zinc-500' : 'text-[#a1a1aa]'}`}>
+              <span className={`text-[10px] sm:text-[11px] font-mono hidden sm:inline-block ${themeMode === 'light' ? 'text-zinc-500' : 'text-[#a1a1aa]'}`}>
                 {profile.role.split('&')[0] || profile.role}
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 mr-2 lg:mr-4">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 mr-2">
             {navLinks.map((link) => (
               <a
                 key={link.label}
                 id={`nav-link-${link.label.toLowerCase()}`}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-xs font-medium transition-colors ${
                   themeMode === 'light'
                     ? 'text-zinc-600 hover:text-zinc-950'
                     : 'text-[#a1a1aa] hover:text-white'
@@ -107,22 +118,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             ))}
           </nav>
 
-          {/* Action Buttons & Theme Controls */}
-          <div className="flex items-center gap-3 sm:gap-3.5 pl-2 sm:pl-3 border-l border-zinc-200/60 dark:border-zinc-800/60">
+          {/* Action Buttons & Auth / Controls */}
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            
             {/* Live Voice Assistant Trigger */}
             {onOpenVoiceAssistant && (
               <button
                 id="btn-nav-voice-assistant"
                 onClick={onOpenVoiceAssistant}
                 title="Talk with AI Voice Assistant (Gemini Live)"
-                className="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all text-white shadow-sm"
+                className="hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-semibold items-center gap-1.5 transition-all text-white shadow-xs"
                 style={{
                   backgroundColor: themeConfig.hex,
-                  boxShadow: `0 4px 14px ${themeConfig.hex}40`
+                  boxShadow: `0 2px 10px ${themeConfig.hex}30`
                 }}
               >
                 <Mic className="w-3.5 h-3.5 animate-pulse" />
-                <span className="hidden lg:inline">AI Voice</span>
+                <span className="hidden xl:inline">AI Voice</span>
                 <span className="text-[9px] uppercase font-mono px-1 rounded bg-black/20 text-white/90">
                   Live
                 </span>
@@ -134,22 +146,25 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="btn-open-customizer"
               onClick={onOpenCustomizer}
               title="Customize Portfolio Details & Theme"
-              className={`p-2 rounded-xl text-sm flex items-center gap-1.5 transition-all border ${
+              className={`p-2 rounded-xl text-xs flex items-center gap-1.5 transition-all border ${
                 themeMode === 'light'
                   ? 'border-slate-200 bg-white text-zinc-700 hover:bg-slate-100 hover:text-zinc-950'
                   : 'border-[#27272a] bg-[#111111] text-[#a1a1aa] hover:bg-[#1a1a1a] hover:text-white'
               }`}
             >
-              <Sliders className="w-4 h-4 text-blue-400" />
-              <span className="hidden xl:inline text-xs font-medium">Customize</span>
+              <Sliders className="w-3.5 h-3.5 text-blue-400" />
+              <span className="hidden sm:inline font-medium">Customize</span>
             </button>
 
             {/* Theme Settings Dropdown Button */}
             <div className="relative">
               <button
                 id="btn-theme-toggle"
-                onClick={() => setShowThemeMenu(!showThemeMenu)}
-                className={`p-2 rounded-xl text-sm transition-all border ${
+                onClick={() => {
+                  setShowThemeMenu(!showThemeMenu);
+                  setShowUserMenu(false);
+                }}
+                className={`p-2 rounded-xl text-xs transition-all border ${
                   themeMode === 'light'
                     ? 'border-slate-200 bg-white text-zinc-700 hover:bg-slate-100'
                     : 'border-[#27272a] bg-[#111111] text-[#a1a1aa] hover:bg-[#1a1a1a] hover:text-white'
@@ -157,9 +172,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Change theme appearance & accent"
               >
                 {themeMode === 'light' ? (
-                  <Sun className="w-4 h-4 text-amber-500" />
+                  <Sun className="w-3.5 h-3.5 text-amber-500" />
                 ) : (
-                  <Moon className="w-4 h-4 text-blue-400" />
+                  <Moon className="w-3.5 h-3.5 text-blue-400" />
                 )}
               </button>
 
@@ -229,31 +244,167 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
 
+            {/* AUTH / LOGIN TAB BUTTON & USER MENU */}
+            <div className="relative">
+              {currentUser ? (
+                <button
+                  id="btn-nav-user-profile"
+                  onClick={() => {
+                    setShowUserMenu(!showUserMenu);
+                    setShowThemeMenu(false);
+                  }}
+                  className={`flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-full border transition-all text-xs font-medium ${
+                    isOwner
+                      ? 'border-amber-500/40 bg-amber-500/10 text-amber-300'
+                      : themeMode === 'light'
+                        ? 'border-slate-200 bg-white text-zinc-800 hover:bg-slate-50'
+                        : 'border-zinc-700 bg-zinc-900 text-zinc-100 hover:bg-zinc-800'
+                  }`}
+                >
+                  {currentUser.photoURL ? (
+                    <img 
+                      src={currentUser.photoURL} 
+                      alt={currentUser.displayName || 'User'} 
+                      className="w-6 h-6 rounded-full border border-white/20 object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-blue-500/30 text-white font-bold flex items-center justify-center text-[10px]">
+                      {currentUser.displayName?.charAt(0) || currentUser.email?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                  <span className="hidden sm:inline font-mono text-[11px] max-w-[100px] truncate">
+                    {isOwner ? 'Owner' : currentUser.displayName?.split(' ')[0] || 'Account'}
+                  </span>
+                  {isOwner && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  )}
+                  <ChevronDown className="w-3 h-3 text-zinc-400" />
+                </button>
+              ) : (
+                <button
+                  id="btn-nav-login"
+                  onClick={() => onOpenAuth('user_login')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                    themeMode === 'light'
+                      ? 'border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-100 hover:border-zinc-400'
+                      : 'border-zinc-700 bg-zinc-900 text-zinc-200 hover:bg-zinc-800 hover:text-white'
+                  }`}
+                  title="Sign In / Register / Owner Login"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Login</span>
+                </button>
+              )}
+
+              {/* User Profile Popover */}
+              {showUserMenu && currentUser && (
+                <div 
+                  id="nav-user-dropdown-popover"
+                  className={`absolute right-0 mt-2 w-64 rounded-2xl shadow-2xl border p-3 z-50 animate-in fade-in zoom-in-95 duration-150 ${
+                    themeMode === 'light'
+                      ? 'bg-white border-slate-200 text-zinc-900'
+                      : 'bg-[#111111] border-[#27272a] text-zinc-100'
+                  }`}
+                >
+                  {/* Account Header */}
+                  <div className="p-2 pb-3 border-b border-zinc-700/50 mb-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold truncate">
+                        {currentUser.displayName || 'Portfolio User'}
+                      </span>
+                      {isOwner ? (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          Owner
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                          Member
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-zinc-400 font-mono truncate">
+                      {currentUser.email}
+                    </div>
+                  </div>
+
+                  {/* Menu Options */}
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenCustomizer();
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-zinc-800/60 flex items-center gap-2 text-zinc-300 hover:text-white transition-colors"
+                    >
+                      <Sliders className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Portfolio Customizer</span>
+                    </button>
+
+                    {!isOwner && (
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          onOpenAuth('owner_login');
+                        }}
+                        className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-amber-500/10 flex items-center gap-2 text-amber-400 transition-colors"
+                      >
+                        <Shield className="w-3.5 h-3.5" />
+                        <span>Unlock Owner Access</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onOpenAuth('user_login');
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-zinc-800/60 flex items-center gap-2 text-zinc-400 hover:text-zinc-200 transition-colors"
+                    >
+                      <User className="w-3.5 h-3.5" />
+                      <span>Switch Account</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        onSignOut();
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs hover:bg-rose-500/10 flex items-center gap-2 text-rose-400 transition-colors"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Let's Talk CTA */}
             <a
               id="nav-cta-contact"
               href="#contact"
-              className={`hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold tracking-tight uppercase transition-all shadow-md ${
+              className={`hidden md:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold tracking-tight uppercase transition-all shadow-md ${
                 themeMode === 'light'
                   ? 'bg-zinc-950 text-white hover:bg-zinc-800'
                   : 'bg-white text-[#050505] hover:bg-zinc-200'
               }`}
             >
-              <span>Start a Project</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>Start Project</span>
+              <ArrowUpRight className="w-3 h-3" />
             </a>
 
             {/* Mobile Menu Toggle */}
             <button
               id="btn-mobile-menu-toggle"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 rounded-xl md:hidden border transition-colors ${
+              className={`p-2 rounded-xl lg:hidden border transition-colors ${
                 themeMode === 'light'
                   ? 'border-slate-200 bg-white text-zinc-700'
                   : 'border-[#27272a] bg-[#111111] text-[#a1a1aa]'
               }`}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -262,13 +413,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         {mobileMenuOpen && (
           <div 
             id="mobile-nav-drawer"
-            className={`md:hidden mt-3 rounded-2xl p-5 border shadow-2xl ${
+            className={`lg:hidden mt-3 rounded-2xl p-5 border shadow-2xl ${
               themeMode === 'light'
                 ? 'bg-white border-slate-200'
                 : 'bg-[#111111] border-[#27272a]'
             }`}
           >
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col space-y-2.5">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -283,7 +434,67 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {link.label}
                 </a>
               ))}
+              
               <div className="pt-3 border-t border-[#27272a] flex flex-col gap-2">
+                {/* Auth In Drawer */}
+                {currentUser ? (
+                  <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between">
+                    <div>
+                      <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <span>{currentUser.displayName || 'User'}</span>
+                        {isOwner && (
+                          <span className="text-[10px] font-mono px-1 rounded bg-amber-500/20 text-amber-400">
+                            Owner
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-zinc-400 font-mono truncate">{currentUser.email}</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onSignOut();
+                      }}
+                      className="text-xs text-rose-400 hover:underline font-mono"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAuth('user_login');
+                      }}
+                      className="py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white flex items-center justify-center gap-1"
+                    >
+                      <LogIn className="w-3 h-3" />
+                      <span>Login</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAuth('owner_login');
+                      }}
+                      className="py-2 rounded-xl text-xs font-semibold bg-amber-600 text-white flex items-center justify-center gap-1"
+                    >
+                      <Shield className="w-3 h-3" />
+                      <span>Owner</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onOpenAuth('signup');
+                      }}
+                      className="py-2 rounded-xl text-xs font-semibold bg-emerald-600 text-white flex items-center justify-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Sign Up</span>
+                    </button>
+                  </div>
+                )}
+
                 {onOpenVoiceAssistant && (
                   <button
                     onClick={() => {
@@ -297,6 +508,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span>Talk with AI Voice (Gemini Live)</span>
                   </button>
                 )}
+                
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -305,12 +517,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full border border-[#27272a] bg-[#1a1a1a] text-[#a1a1aa] text-xs font-medium"
                 >
                   <Sliders className="w-3.5 h-3.5 text-blue-400" />
-                  Customize Profile & Theme
+                  <span>Customize Profile & Theme</span>
                 </button>
                 <a
                   href="#contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-center gap-1.5 w-full py-2.5 rounded-full text-xs font-bold uppercase text-[#050505] bg-white hover:bg-zinc-200`}
+                  className="flex items-center justify-center gap-1.5 w-full py-2.5 rounded-full text-xs font-bold uppercase text-[#050505] bg-white hover:bg-zinc-200"
                 >
                   <span>Start a Project</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />

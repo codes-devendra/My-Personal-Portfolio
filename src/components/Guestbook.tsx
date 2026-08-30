@@ -155,9 +155,9 @@ export const Guestbook: React.FC<GuestbookProps> = ({ themeMode }) => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between pb-3 border-b border-[#27272a]">
                     <div className="flex items-center gap-3">
-                      {currentUser.photoURL ? (
+                      {currentUser.photoURL && currentUser.photoURL.trim() !== '' ? (
                         <img 
-                          src={currentUser.photoURL} 
+                          src={currentUser.photoURL.trim()} 
                           alt={currentUser.displayName || 'User'} 
                           className="w-9 h-9 rounded-full border border-[#27272a]"
                           referrerPolicy="no-referrer"
@@ -281,16 +281,16 @@ export const Guestbook: React.FC<GuestbookProps> = ({ themeMode }) => {
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2.5">
-                      {entry.userAvatar ? (
+                      {entry.userAvatar && entry.userAvatar.trim() !== '' ? (
                         <img 
-                          src={entry.userAvatar} 
-                          alt={entry.userName} 
+                          src={entry.userAvatar.trim()} 
+                          alt={entry.userName || 'User'} 
                           className="w-7 h-7 rounded-full border border-[#27272a]"
                           referrerPolicy="no-referrer"
                         />
                       ) : (
                         <div className="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">
-                          {entry.userName.charAt(0)}
+                          {entry.userName?.charAt(0) || 'U'}
                         </div>
                       )}
                       <div>

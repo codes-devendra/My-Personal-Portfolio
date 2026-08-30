@@ -1,14 +1,55 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, doc, getDoc, getDocFromServer, setDoc, addDoc, collection, onSnapshot, query, orderBy, limit, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  GithubAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut, 
+  onAuthStateChanged, 
+  User 
+} from 'firebase/auth';
+import { 
+  initializeFirestore,
+  getFirestore, 
+  doc, 
+  getDoc, 
+  getDocFromServer, 
+  setDoc, 
+  addDoc, 
+  collection, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  limit, 
+  serverTimestamp, 
+  deleteDoc 
+} from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-/* CRITICAL: The app requires firebaseConfig.firestoreDatabaseId */
-export const db = getFirestore(app, (firebaseConfig as { firestoreDatabaseId?: string }).firestoreDatabaseId);
+const firestoreDbId = (firebaseConfig as { firestoreDatabaseId?: string }).firestoreDatabaseId;
+
+/* Initialize Firestore with auto-detect long polling and resilience for iframe sandboxes */
+let firestoreDb;
+try {
+  firestoreDb = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+    ignoreUndefinedProperties: true
+  }, firestoreDbId);
+} catch {
+  firestoreDb = getFirestore(app, firestoreDbId);
+}
+
+export const db = firestoreDb;
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+export const githubProvider = new GithubAuthProvider();
+export const facebookProvider = new FacebookAuthProvider();
 
 export enum OperationType {
   CREATE = 'create',
@@ -62,11 +103,29 @@ export async function testFirestoreConnection() {
   try {
     await getDocFromServer(doc(db, 'portfolio', 'profile'));
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn("Please check your Firebase configuration or network status.");
+    if (error instanceof Error && (error.message.includes('offline') || error.message.includes('unavailable') || (error as { code?: string }).code === 'unavailable')) {
+      console.warn("Firestore running in offline/cache mode until connection is re-established.");
     }
   }
 }
 
-export { signInWithPopup, signOut, onAuthStateChanged, doc, getDoc, setDoc, addDoc, collection, onSnapshot, query, orderBy, limit, serverTimestamp, deleteDoc };
+export { 
+  signInWithPopup, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut, 
+  onAuthStateChanged, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  addDoc, 
+  collection, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  limit, 
+  serverTimestamp, 
+  deleteDoc 
+};
 export type { User };

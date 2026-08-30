@@ -209,12 +209,21 @@ export const Hero: React.FC<HeroProps> = ({
                 {/* Avatar & Headline inside card */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="relative">
-                    <img
-                      src={profile.avatarUrl}
-                      alt={profile.name}
-                      referrerPolicy="no-referrer"
-                      className="w-16 h-16 rounded-xl object-cover border border-[#27272a]"
-                    />
+                    {profile.avatarUrl && profile.avatarUrl.trim() !== '' ? (
+                      <img
+                        src={profile.avatarUrl.trim()}
+                        alt={profile.name || 'Profile'}
+                        referrerPolicy="no-referrer"
+                        className="w-16 h-16 rounded-xl object-cover border border-[#27272a]"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl bg-blue-500/20 text-blue-400 font-bold text-xl flex items-center justify-center border border-[#27272a]">
+                        {profile.name?.charAt(0) || 'S'}
+                      </div>
+                    )}
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 border-2 border-[#111111] flex items-center justify-center">
                       <CheckCircle2 className="w-3 h-3 text-white" />
                     </div>

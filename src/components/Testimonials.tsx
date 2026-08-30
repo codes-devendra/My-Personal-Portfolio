@@ -68,12 +68,21 @@ export const Testimonials: React.FC<TestimonialsProps> = ({
 
               {/* Author Footer */}
               <div className="pt-6 mt-6 border-t border-zinc-800/60 flex items-center gap-3.5">
-                <img
-                  src={item.avatar}
-                  alt={item.name}
-                  referrerPolicy="no-referrer"
-                  className="w-11 h-11 rounded-full object-cover border border-zinc-700"
-                />
+                {item.avatar && item.avatar.trim() !== '' ? (
+                  <img
+                    src={item.avatar.trim()}
+                    alt={item.name}
+                    referrerPolicy="no-referrer"
+                    className="w-11 h-11 rounded-full object-cover border border-zinc-700"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop';
+                    }}
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-full bg-blue-500/20 text-blue-400 font-bold text-sm flex items-center justify-center border border-zinc-700">
+                    {item.name?.charAt(0) || 'C'}
+                  </div>
+                )}
                 <div>
                   <h4 className={`font-display font-semibold text-sm ${themeMode === 'light' ? 'text-zinc-900' : 'text-white'}`}>
                     {item.name}
