@@ -17,6 +17,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { LiveEditorModal } from './components/LiveEditorModal';
 import { AuthModal, AuthTab } from './components/AuthModal';
+import { AuthGateScreen } from './components/AuthGateScreen';
 import { 
   initialProfile, initialProjects, initialSkills, 
   initialExperience, initialServices, initialTestimonials, initialArticles 
@@ -68,6 +69,7 @@ export default function App() {
   const [prefilledService, setPrefilledService] = useState<string | undefined>(undefined);
 
   // Authentication State
+  const [authInitialized, setAuthInitialized] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isOwner, setIsOwner] = useState<boolean>(() => {
     try {
@@ -85,6 +87,7 @@ export default function App() {
         setIsOwner(true);
         sessionStorage.setItem('portfolio_owner_unlocked', 'true');
       }
+      setAuthInitialized(true);
     });
     return () => unsub();
   }, []);
@@ -171,12 +174,35 @@ export default function App() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setCurrentUser(null);
       setIsOwner(false);
       sessionStorage.removeItem('portfolio_owner_unlocked');
     } catch (err) {
       console.error('Error signing out:', err);
     }
   };
+
+  const handleGateAuthenticated = (user: User, isOwnerUser: boolean) => {
+    setCurrentUser(user);
+    if (isOwnerUser) {
+      setIsOwner(true);
+      sessionStorage.setItem('portfolio_owner_unlocked', 'true');
+    }
+  };
+
+  // 1. Mandatory Gate: Everyone MUST login or sign up to access the website
+  const isAccessAllowed = Boolean(currentUser || isOwner);
+
+  if (authInitialized && !isAccessAllowed) {
+    return (
+      <AuthGateScreen
+        onAuthenticated={handleGateAuthenticated}
+        accent={accent}
+        themeMode={themeMode}
+        profile={profile}
+      />
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${
@@ -323,6 +349,7 @@ export default function App() {
         setAccent={handleSetAccent}
         themeMode={themeMode}
         setThemeMode={handleSetThemeMode}
+        isOwnerUser={isOwner}
       />
 
       {/* Dedicated Login / Owner Login / Sign Up Modal */}

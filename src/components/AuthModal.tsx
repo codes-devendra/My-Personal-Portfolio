@@ -694,14 +694,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </button>
               </form>
 
-              {/* Master Password Reminder */}
-              <div className="p-3 rounded-xl border border-zinc-700/50 bg-zinc-900/40 text-[11px] font-mono flex items-center justify-between text-zinc-400">
-                <span>Default Master Key:</span>
-                <code className="px-2 py-0.5 rounded bg-zinc-800 text-amber-300 font-bold">
-                  owner2026
-                </code>
-              </div>
-
               {/* Direct 1-click Google option for owner */}
               <div className="pt-1">
                 <button

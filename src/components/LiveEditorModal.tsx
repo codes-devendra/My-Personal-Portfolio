@@ -18,6 +18,7 @@ interface LiveEditorModalProps {
   setAccent: (accent: AccentColor) => void;
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
+  isOwnerUser?: boolean;
 }
 
 const COMMON_TIMEZONES = [
@@ -34,7 +35,7 @@ const COMMON_TIMEZONES = [
   { label: 'Australia (Sydney, Melbourne)', value: 'Australia/Sydney', offset: 'UTC+10 / AEST' }
 ];
 
-type EditorTab = 'profile' | 'bio' | 'socials' | 'theme' | 'timezone';
+type EditorTab = 'profile' | 'bio' | 'socials' | 'theme' | 'timezone' | 'security';
 
 // Owner master passwords
 const VALID_PASSWORDS = ['owner2026', 'admin2026', 'shobha2026'];
@@ -48,7 +49,8 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
   accent,
   setAccent,
   themeMode,
-  setThemeMode
+  setThemeMode,
+  isOwnerUser = false
 }) => {
   const [activeTab, setActiveTab] = useState<EditorTab>('profile');
   const [formData, setFormData] = useState<ProfileData>(profile);
@@ -196,15 +198,16 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
     onClose();
   };
 
-  const protectedTabs: EditorTab[] = ['profile', 'bio', 'socials'];
+  const protectedTabs: EditorTab[] = ['profile', 'bio', 'socials', 'security'];
   const isCurrentTabProtected = protectedTabs.includes(activeTab);
 
-  const tabs: { id: EditorTab; label: string; icon: React.FC<{ className?: string }>; protected?: boolean }[] = [
+  const tabs: { id: EditorTab; label: string; icon: React.FC<{ className?: string }>; protected?: boolean; ownerOnly?: boolean }[] = [
     { id: 'profile', label: 'Profile Info', icon: User, protected: true },
     { id: 'bio', label: 'Bio & Stats', icon: Briefcase, protected: true },
     { id: 'socials', label: 'Socials & Links', icon: Link2, protected: true },
     { id: 'theme', label: 'Color & Theme', icon: Palette, protected: false },
-    { id: 'timezone', label: 'Timezone', icon: Clock, protected: false }
+    { id: 'timezone', label: 'Timezone', icon: Clock, protected: false },
+    ...(isOwnerUnlocked ? [{ id: 'security' as EditorTab, label: 'Owner Key', icon: Shield, protected: true, ownerOnly: true }] : [])
   ];
 
   return (
@@ -357,7 +360,7 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
                       setEnteredPassword(e.target.value);
                       if (passwordError) setPasswordError(null);
                     }}
-                    placeholder="Enter owner password..."
+                    placeholder="Enter owner secret password..."
                     className={`w-full pl-10 pr-10 py-2.5 rounded-xl text-xs font-mono border focus:outline-hidden transition-colors ${
                       selectedTheme === 'light'
                         ? 'bg-white border-zinc-300 text-zinc-900 focus:border-blue-500'
@@ -388,13 +391,6 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
                   <span>Unlock Owner Tabs</span>
                 </button>
               </form>
-
-              <div className="pt-2 border-t border-zinc-200/40 dark:border-zinc-800/60 w-full max-w-sm flex items-center justify-between text-[11px] font-mono text-zinc-400">
-                <span>Default Password:</span>
-                <code className="px-2 py-0.5 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold">
-                  owner2026
-                </code>
-              </div>
             </div>
           ) : (
             <>
@@ -962,6 +958,63 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
                         : 'bg-zinc-950 border-zinc-800 text-zinc-100 focus:border-zinc-600'
                     }`}
                   />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: OWNER SECURITY & MASTER PASSWORDS (ACCESSIBLE TO OWNER ONLY) */}
+          {activeTab === 'security' && isOwnerUnlocked && (
+            <div className="space-y-4">
+              <div className={`p-4 rounded-2xl border ${
+                selectedTheme === 'light' ? 'bg-amber-50/80 border-amber-200' : 'bg-amber-500/10 border-amber-500/20'
+              }`}>
+                <div className="flex items-center gap-2 text-amber-500 font-semibold text-xs mb-1">
+                  <Shield className="w-4 h-4" />
+                  <span>Owner Master Passwords & Credentials</span>
+                </div>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  Only the verified portfolio owner can access this panel. Regular visitors and signed-in members cannot see or access these master keys.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className={`p-4 rounded-2xl border space-y-2 ${
+                  selectedTheme === 'light' ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900/60 border-zinc-800'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-zinc-400">Primary Master Password:</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Active
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-black/20 border border-zinc-700/50">
+                    <code className="text-sm font-mono font-bold text-amber-400">
+                      owner2026
+                    </code>
+                    <span className="text-[11px] font-mono text-zinc-400">
+                      (Full Customizer & Gate Bypass)
+                    </span>
+                  </div>
+                </div>
+
+                <div className={`p-4 rounded-2xl border space-y-2 ${
+                  selectedTheme === 'light' ? 'bg-zinc-50 border-zinc-200' : 'bg-zinc-900/60 border-zinc-800'
+                }`}>
+                  <div className="text-xs font-mono text-zinc-400">Secondary Admin Passwords:</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {VALID_PASSWORDS.slice(1).map((pwd) => (
+                      <div key={pwd} className="p-2.5 rounded-xl bg-black/20 border border-zinc-700/40 font-mono text-xs text-zinc-300 flex items-center justify-between">
+                        <span>{pwd}</span>
+                        <span className="text-[10px] text-zinc-400">Backup</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 text-xs text-blue-400 flex items-center gap-2">
+                  <KeyRound className="w-4 h-4 shrink-0" />
+                  <span>Your owner email: <strong>shobhasolanki230@gmail.com</strong> also gives direct owner privileges upon login.</span>
                 </div>
               </div>
             </div>
