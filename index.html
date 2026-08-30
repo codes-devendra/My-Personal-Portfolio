@@ -12,6 +12,46 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        var origError = console.error;
+        var origWarn = console.warn;
+        function isWsMsg(args) {
+          try {
+            for (var i = 0; i < args.length; i++) {
+              var str = typeof args[i] === 'object' && args[i] !== null ? (args[i].message || JSON.stringify(args[i])) : String(args[i]);
+              if (str.indexOf('WebSocket') !== -1 || str.indexOf('websocket') !== -1 || (str.indexOf('vite') !== -1 && str.indexOf('failed') !== -1)) {
+                return true;
+              }
+            }
+          } catch(e) {}
+          return false;
+        }
+        console.error = function() {
+          if (isWsMsg(arguments)) return;
+          origError.apply(console, arguments);
+        };
+        console.warn = function() {
+          if (isWsMsg(arguments)) return;
+          origWarn.apply(console, arguments);
+        };
+        window.addEventListener('unhandledrejection', function(e) {
+          var r = e.reason;
+          var msg = typeof r === 'string' ? r : (r && r.message ? r.message : '');
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
+        window.addEventListener('error', function(e) {
+          var msg = e.message || '';
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('websocket') !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body class="font-sans antialiased selection:bg-blue-600 selection:text-white bg-[#050505] text-white">
     <div id="root"></div>

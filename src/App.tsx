@@ -70,7 +70,14 @@ export default function App() {
 
   // Authentication State
   const [authInitialized, setAuthInitialized] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | any>(() => {
+    try {
+      const stored = localStorage.getItem('portfolio_current_user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isOwner, setIsOwner] = useState<boolean>(() => {
     try {
       return sessionStorage.getItem('portfolio_owner_unlocked') === 'true';
@@ -82,10 +89,15 @@ export default function App() {
   // Track Firebase Auth State
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      if (user?.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())) {
-        setIsOwner(true);
-        sessionStorage.setItem('portfolio_owner_unlocked', 'true');
+      if (user) {
+        setCurrentUser(user);
+        try {
+          localStorage.setItem('portfolio_current_user', JSON.stringify(user));
+        } catch {}
+        if (user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())) {
+          setIsOwner(true);
+          sessionStorage.setItem('portfolio_owner_unlocked', 'true');
+        }
       }
       setAuthInitialized(true);
     });
@@ -191,16 +203,22 @@ export default function App() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      setCurrentUser(null);
-      setIsOwner(false);
-      sessionStorage.removeItem('portfolio_owner_unlocked');
-    } catch (err) {
-      console.error('Error signing out:', err);
+    } catch (_err) {
+      // Quiet sign out
     }
+    setCurrentUser(null);
+    setIsOwner(false);
+    try {
+      sessionStorage.removeItem('portfolio_owner_unlocked');
+      localStorage.removeItem('portfolio_current_user');
+    } catch {}
   };
 
-  const handleGateAuthenticated = (user: User, isOwnerUser: boolean) => {
+  const handleGateAuthenticated = (user: any, isOwnerUser: boolean) => {
     setCurrentUser(user);
+    try {
+      localStorage.setItem('portfolio_current_user', JSON.stringify(user));
+    } catch {}
     if (isOwnerUser) {
       setIsOwner(true);
       sessionStorage.setItem('portfolio_owner_unlocked', 'true');

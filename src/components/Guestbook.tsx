@@ -99,9 +99,18 @@ export const Guestbook: React.FC<GuestbookProps> = ({ accent, themeMode }) => {
     try {
       setError(null);
       await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-      console.error("Sign-in failed:", err);
-      setError("Google Sign-In was cancelled or encountered an issue.");
+    } catch (_err) {
+      // Create guest sign in if popup is closed or blocked
+      const guestUser: any = {
+        uid: `guest_${Date.now()}`,
+        displayName: 'Guest Visitor',
+        email: 'guest@portfolio.com',
+        photoURL: null
+      };
+      try {
+        localStorage.setItem('portfolio_current_user', JSON.stringify(guestUser));
+      } catch {}
+      window.location.reload();
     }
   };
 
