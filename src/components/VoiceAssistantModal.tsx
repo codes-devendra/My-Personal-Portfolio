@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useGeminiLive } from '../hooks/useGeminiLive';
 import { AccentColor, ThemeMode } from '../types';
+import { accentThemes } from '../utils/theme';
 
 interface VoiceAssistantModalProps {
   isOpen: boolean;
@@ -32,6 +33,8 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
   accent,
   themeMode
 }) => {
+  const themeConfig = accentThemes[accent] || accentThemes.rose || accentThemes.blue;
+
   const {
     connectionState,
     isMuted,
@@ -112,7 +115,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
             <div className="flex items-center gap-3">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center relative shadow-lg"
-                style={{ backgroundColor: `${accent.hex}20`, color: accent.hex }}
+                style={{ backgroundColor: `${themeConfig.hex}20`, color: themeConfig.hex }}
               >
                 <Sparkles className="w-5 h-5 animate-pulse" />
                 {connectionState === 'connected' && (
@@ -167,10 +170,10 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
               className="absolute w-72 h-72 rounded-full blur-3xl -z-0 opacity-20 pointer-events-none transition-all duration-700"
               style={{
                 backgroundColor: isSpeaking
-                  ? accent.hex
+                  ? themeConfig.hex
                   : isUserTalking
                   ? '#3b82f6'
-                  : `${accent.hex}40`,
+                  : `${themeConfig.hex}40`,
                 transform: `scale(${1 + (isSpeaking ? outputVolume : inputVolume) * 1.2})`
               }}
             />
@@ -200,7 +203,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                 <button
                   onClick={connect}
                   className="mt-2 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all shadow-md flex items-center gap-2"
-                  style={{ backgroundColor: accent.hex }}
+                  style={{ backgroundColor: themeConfig.hex }}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Try Again
@@ -220,7 +223,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                 <button
                   onClick={connect}
                   className="mt-2 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all shadow-md flex items-center gap-2"
-                  style={{ backgroundColor: accent.hex }}
+                  style={{ backgroundColor: themeConfig.hex }}
                 >
                   <Radio className="w-3.5 h-3.5" />
                   Start New Call
@@ -238,7 +241,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                       <motion.div
                         className="absolute rounded-full border opacity-40 pointer-events-none"
                         style={{
-                          borderColor: isSpeaking ? accent.hex : '#3b82f6',
+                          borderColor: isSpeaking ? themeConfig.hex : '#3b82f6',
                           width: '140px',
                           height: '140px'
                         }}
@@ -255,7 +258,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                       <motion.div
                         className="absolute rounded-full border opacity-20 pointer-events-none"
                         style={{
-                          borderColor: isSpeaking ? accent.hex : '#3b82f6',
+                          borderColor: isSpeaking ? themeConfig.hex : '#3b82f6',
                           width: '180px',
                           height: '180px'
                         }}
@@ -286,12 +289,12 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                     className="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl relative z-10 transition-colors duration-300"
                     style={{
                       background: isSpeaking
-                        ? `radial-gradient(circle, ${accent.hex} 0%, #1e1b4b 100%)`
+                        ? `radial-gradient(circle, ${themeConfig.hex} 0%, #1e1b4b 100%)`
                         : isUserTalking
                         ? 'radial-gradient(circle, #3b82f6 0%, #172554 100%)'
                         : 'radial-gradient(circle, #27272a 0%, #09090b 100%)',
                       boxShadow: isSpeaking
-                        ? `0 0 35px ${accent.hex}80`
+                        ? `0 0 35px ${themeConfig.hex}80`
                         : isUserTalking
                         ? '0 0 35px #3b82f680'
                         : '0 0 15px rgba(0,0,0,0.5)'
@@ -371,7 +374,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                     {msg.sender === 'assistant' && (
                       <div
                         className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 mt-0.5"
-                        style={{ backgroundColor: `${accent.hex}25`, color: accent.hex }}
+                        style={{ backgroundColor: `${themeConfig.hex}25`, color: themeConfig.hex }}
                       >
                         <Bot className="w-3.5 h-3.5" />
                       </div>
@@ -461,7 +464,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = ({
                   <button
                     onClick={connect}
                     className="px-4 py-2 text-white rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all shadow-md"
-                    style={{ backgroundColor: accent.hex }}
+                    style={{ backgroundColor: themeConfig.hex }}
                   >
                     <Radio className="w-4 h-4" />
                     <span>Connect Live</span>

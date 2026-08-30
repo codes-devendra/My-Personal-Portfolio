@@ -25,7 +25,7 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
   accent,
   themeMode
 }) => {
-  const themeConfig = accentThemes[accent];
+  const themeConfig = accentThemes[accent] || accentThemes.rose || accentThemes.blue;
 
   const capabilities = [
     {
@@ -62,7 +62,7 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
       {/* Background Glow */}
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full blur-[140px] opacity-15 pointer-events-none"
-        style={{ backgroundColor: accent.hex }}
+        style={{ backgroundColor: themeConfig.hex }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -100,11 +100,11 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
                 <span className="flex h-3 w-3 relative">
                   <span
                     className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                    style={{ backgroundColor: accent.hex }}
+                    style={{ backgroundColor: themeConfig.hex }}
                   />
                   <span
                     className="relative inline-flex rounded-full h-3 w-3"
-                    style={{ backgroundColor: accent.hex }}
+                    style={{ backgroundColor: themeConfig.hex }}
                   />
                 </span>
                 <span className="text-xs font-mono uppercase tracking-wider text-emerald-400 font-semibold">
@@ -149,8 +149,8 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
                   onClick={onOpenVoiceAssistant}
                   className="px-7 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center gap-2.5 shadow-xl hover:opacity-95 transition-all transform hover:-translate-y-0.5"
                   style={{
-                    backgroundColor: accent.hex,
-                    boxShadow: `0 10px 30px ${accent.hex}40`
+                    backgroundColor: themeConfig.hex,
+                    boxShadow: `0 10px 30px ${themeConfig.hex}40`
                   }}
                 >
                   <Mic className="w-5 h-5" />
@@ -180,8 +180,8 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
                   <div
                     className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl relative z-10 transition-transform group-hover:scale-110"
                     style={{
-                      background: `radial-gradient(circle, ${accent.hex} 0%, #1e1b4b 100%)`,
-                      boxShadow: `0 0 30px ${accent.hex}60`
+                      background: `radial-gradient(circle, ${themeConfig.hex} 0%, #1e1b4b 100%)`,
+                      boxShadow: `0 0 30px ${themeConfig.hex}60`
                     }}
                   >
                     <Mic className="w-10 h-10 text-white" />
@@ -193,7 +193,7 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
                       <motion.div
                         key={idx}
                         className="w-1 rounded-full"
-                        style={{ backgroundColor: accent.hex }}
+                        style={{ backgroundColor: themeConfig.hex }}
                         animate={{ height: [`${height * 0.4}%`, `${height}%`, `${height * 0.4}%`] }}
                         transition={{
                           repeat: Infinity,
@@ -214,7 +214,7 @@ export const VoiceAssistantSection: React.FC<VoiceAssistantSectionProps> = ({
 
                 <div
                   className="w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 text-white shadow-md transition-opacity"
-                  style={{ backgroundColor: `${accent.hex}dd` }}
+                  style={{ backgroundColor: `${themeConfig.hex}dd` }}
                 >
                   <Radio className="w-3.5 h-3.5 animate-pulse" />
                   <span>Launch Voice Mode</span>

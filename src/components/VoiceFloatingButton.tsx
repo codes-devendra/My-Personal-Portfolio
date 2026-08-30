@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Mic, Sparkles } from 'lucide-react';
 import { AccentColor } from '../types';
+import { accentThemes } from '../utils/theme';
 
 interface VoiceFloatingButtonProps {
   onClick: () => void;
@@ -12,6 +13,8 @@ export const VoiceFloatingButton: React.FC<VoiceFloatingButtonProps> = ({
   onClick,
   accent
 }) => {
+  const themeConfig = accentThemes[accent] || accentThemes.rose || accentThemes.blue;
+
   return (
     <div className="fixed bottom-6 right-6 z-40 flex items-center gap-3">
       {/* Interactive Tooltip / Pill */}
@@ -25,11 +28,11 @@ export const VoiceFloatingButton: React.FC<VoiceFloatingButtonProps> = ({
         <span className="relative flex h-2 w-2">
           <span
             className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-            style={{ backgroundColor: accent.hex }}
+            style={{ backgroundColor: themeConfig.hex }}
           />
           <span
             className="relative inline-flex rounded-full h-2 w-2"
-            style={{ backgroundColor: accent.hex }}
+            style={{ backgroundColor: themeConfig.hex }}
           />
         </span>
         <span className="font-medium">Talk to AI Voice</span>
@@ -46,15 +49,15 @@ export const VoiceFloatingButton: React.FC<VoiceFloatingButtonProps> = ({
         onClick={onClick}
         className="relative group p-4 rounded-2xl shadow-2xl text-white flex items-center justify-center cursor-pointer transition-all duration-300 border border-white/20"
         style={{
-          backgroundColor: accent.hex,
-          boxShadow: `0 8px 30px ${accent.hex}60`
+          backgroundColor: themeConfig.hex,
+          boxShadow: `0 8px 30px ${themeConfig.hex}60`
         }}
         title="Start Live Gemini Voice Conversation"
       >
         {/* Ambient Ring */}
         <div
           className="absolute inset-0 rounded-2xl animate-pulse opacity-50 blur-sm -z-10"
-          style={{ backgroundColor: accent.hex }}
+          style={{ backgroundColor: themeConfig.hex }}
         />
 
         <div className="relative flex items-center justify-center">

@@ -38,7 +38,7 @@ const COMMON_TIMEZONES = [
 type EditorTab = 'profile' | 'bio' | 'socials' | 'theme' | 'timezone' | 'security';
 
 // Owner master passwords
-const VALID_PASSWORDS = ['owner2026', 'admin2026', 'shobha2026'];
+const VALID_PASSWORDS = ['devendra2026', 'owner2026', 'admin2026', 'shobha2026'];
 
 export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
   isOpen,
@@ -1014,7 +1014,7 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
 
                 <div className="p-3 rounded-xl border border-blue-500/20 bg-blue-500/5 text-xs text-blue-400 flex items-center gap-2">
                   <KeyRound className="w-4 h-4 shrink-0" />
-                  <span>Your owner email: <strong>shobhasolanki230@gmail.com</strong> also gives direct owner privileges upon login.</span>
+                  <span>Your owner email: <strong>solankidevendra726@gmail.com</strong> (and shobhasolanki230@gmail.com) gives direct owner privileges upon login.</span>
                 </div>
               </div>
             </div>

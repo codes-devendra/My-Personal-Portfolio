@@ -25,7 +25,7 @@ import {
 import { ProfileData, Project, SkillCategory, Experience as ExperienceType, Service, Testimonial, Article, AccentColor, ThemeMode } from './types';
 import { db, doc, onSnapshot, setDoc, auth, onAuthStateChanged, signOut, User } from './lib/firebase';
 
-const OWNER_EMAIL = 'shobhasolanki230@gmail.com';
+const OWNER_EMAILS = ['solankidevendra726@gmail.com', 'shobhasolanki230@gmail.com'];
 
 export default function App() {
   const [profile, setProfile] = useState<ProfileData>(() => {
@@ -47,18 +47,18 @@ export default function App() {
   const [accent, setAccent] = useState<AccentColor>(() => {
     try {
       const saved = localStorage.getItem('portfolio_accent');
-      return (saved as AccentColor) || 'blue';
+      return (saved as AccentColor) || 'rose';
     } catch {
-      return 'blue';
+      return 'rose';
     }
   });
 
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     try {
       const saved = localStorage.getItem('portfolio_theme');
-      return (saved as ThemeMode) || 'dark';
+      return (saved as ThemeMode) || 'light';
     } catch {
-      return 'dark';
+      return 'light';
     }
   });
 
@@ -83,7 +83,7 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      if (user?.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()) {
+      if (user?.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())) {
         setIsOwner(true);
         sessionStorage.setItem('portfolio_owner_unlocked', 'true');
       }
@@ -94,22 +94,37 @@ export default function App() {
 
   // Sync profile with Firestore if remote exists
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'portfolio', 'profile'), (snap) => {
-      if (snap.exists()) {
-        const remoteData = snap.data() as Partial<ProfileData>;
-        setProfile((prev) => ({
-          ...prev,
-          ...remoteData,
-          socials: remoteData.socials || prev.socials,
-          detailedBio: remoteData.detailedBio || prev.detailedBio,
-          keyHighlights: remoteData.keyHighlights || prev.keyHighlights
-        }));
-      }
-    }, (err) => {
-      console.warn("Firestore profile snapshot:", err);
-    });
+    let isCancelled = false;
+    let unsub: (() => void) | null = null;
 
-    return () => unsub();
+    try {
+      unsub = onSnapshot(doc(db, 'portfolio', 'profile'), (snap) => {
+        if (isCancelled) return;
+        if (snap.exists()) {
+          const remoteData = snap.data() as Partial<ProfileData>;
+          setProfile((prev) => ({
+            ...prev,
+            ...remoteData,
+            socials: remoteData.socials || prev.socials,
+            detailedBio: remoteData.detailedBio || prev.detailedBio,
+            keyHighlights: remoteData.keyHighlights || prev.keyHighlights
+          }));
+        }
+      }, (_err) => {
+        // If Firestore is not provisioned or offline, cancel subscription to avoid polling warnings
+        if (unsub) {
+          unsub();
+          unsub = null;
+        }
+      });
+    } catch {
+      // Graceful fallback to local state
+    }
+
+    return () => {
+      isCancelled = true;
+      if (unsub) unsub();
+    };
   }, []);
 
   const handleSaveProfile = async (newProfile: ProfileData) => {
@@ -117,24 +132,26 @@ export default function App() {
     try {
       localStorage.setItem('portfolio_profile', JSON.stringify(newProfile));
     } catch (err) {
-      console.error(err);
+      // LocalStorage fallback
     }
 
-    // Also persist to Firestore
-    try {
-      await setDoc(doc(db, 'portfolio', 'profile'), {
-        ...newProfile,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-    } catch (err) {
-      console.warn("Could not sync profile to Firestore (requires auth):", err);
+    // Only attempt to persist to Firestore if the user is authenticated
+    if (currentUser) {
+      try {
+        await setDoc(doc(db, 'portfolio', 'profile'), {
+          ...newProfile,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (_err) {
+        // Quietly fallback to local state
+      }
     }
   };
 
   const handleResetProfile = () => {
     setProfile(initialProfile);
-    setAccent('blue');
-    setThemeMode('dark');
+    setAccent('rose');
+    setThemeMode('light');
     try {
       localStorage.removeItem('portfolio_profile');
       localStorage.removeItem('portfolio_accent');

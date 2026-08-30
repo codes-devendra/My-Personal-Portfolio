@@ -1,8 +1,8 @@
 import { ProfileData, Project, SkillCategory, Experience, Service, Testimonial, Article } from '../types';
 
 export const initialProfile: ProfileData = {
-  name: 'Shobha Solanki',
-  pronouns: 'she/her',
+  name: 'Devendra Solanki',
+  pronouns: 'he/him',
   role: 'Senior Full-Stack Engineer & Product Builder',
   headline: 'Crafting scalable web architectures, resilient distributed systems & intuitive digital experiences.',
   bio: 'I am a software engineer and creative problem solver with over 6 years of experience transforming complex business logic into high-performance, user-centered digital products.',
@@ -11,10 +11,10 @@ export const initialProfile: ProfileData = {
     'Passionate about performance engineering, accessible UI design, clean code architectures, and developer tooling.',
     'Experienced in collaborating across cross-functional teams, driving architectural decisions, and shipping products that scale to millions of users.'
   ],
-  avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop',
-  location: 'San Francisco, CA & Remote',
-  timezone: 'PST (UTC-8)',
-  email: 'shobhasolanki230@gmail.com',
+  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
+  location: 'Mumbai, Maharashtra - 401203',
+  timezone: 'IST (UTC+5:30) • India',
+  email: 'solankidevendra726@gmail.com',
   status: 'available',
   statusText: 'Available for high-impact roles & select consulting',
   yearsOfExperience: 6,
@@ -22,10 +22,10 @@ export const initialProfile: ProfileData = {
   clientsSatisfied: 28,
   openSourceContributions: 140,
   socials: {
-    github: 'https://github.com',
+    github: 'https://github.com/codes-devendra/',
     linkedin: 'https://linkedin.com',
     twitter: 'https://twitter.com',
-    email: 'mailto:shobhasolanki230@gmail.com',
+    email: 'mailto:solankidevendra726@gmail.com',
   },
   keyHighlights: [
     'Led migration of monolith to micro-frontends serving 2M+ active monthly users',
@@ -364,7 +364,7 @@ export const initialTestimonials: Testimonial[] = [
     role: 'VP of Product',
     company: 'HyperScale Labs',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-    content: 'Shobha is one of the rarest engineers who bridges deep technical architecture with an exceptional eye for design. She delivered our analytics suite 2 weeks ahead of schedule with flawless code quality.',
+    content: 'Devendra is one of the rarest engineers who bridges deep technical architecture with an exceptional eye for design. He delivered our analytics suite ahead of schedule with flawless code quality.',
     rating: 5,
     relationship: 'Worked together on Enterprise Analytics Platform'
   },
@@ -374,7 +374,7 @@ export const initialTestimonials: Testimonial[] = [
     role: 'Chief Technology Officer',
     company: 'Krypton Cloud',
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=300&auto=format&fit=crop',
-    content: 'Her ability to solve concurrency bottlenecks and design frictionless user interactions is extraordinary. The real-time synchronization engine she built for our collaborative workspace has been rock-solid.',
+    content: 'His ability to solve concurrency bottlenecks and design frictionless user interactions is extraordinary. The real-time synchronization engine he built for our collaborative workspace has been rock-solid.',
     rating: 5,
     relationship: 'Client on Real-time Engine Project'
   },
@@ -384,7 +384,7 @@ export const initialTestimonials: Testimonial[] = [
     role: 'Engineering Director',
     company: 'Synergy Media Group',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop',
-    content: 'Exceptional communication, clear milestones, and clean, documented code. Working with Shobha was seamless from day one. Highly recommended for any critical software initiative.',
+    content: 'Exceptional communication, clear milestones, and clean, documented code. Working with Devendra was seamless from day one. Highly recommended for any critical software initiative.',
     rating: 5,
     relationship: 'Manager & Collaborator'
   }

@@ -1,6 +1,6 @@
 {
-  "name": "Personal Portfolio & Website",
-  "description": "A modern, interactive personal portfolio website showcasing projects, skills, experience, Google Forms intake, and real-time Gemini Live voice conversations.",
+  "name": "Devendra Solanki Portfolio",
+  "description": "Official personal portfolio of Devendra Solanki — Senior Full-Stack Engineer & Product Builder based in Mumbai, Maharashtra, India. Showcasing projects, skills, and interactive live voice assistant.",
   "requestFramePermissions": [
     "microphone"
   ],

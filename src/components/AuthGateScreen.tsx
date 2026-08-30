@@ -29,8 +29,8 @@ interface AuthGateScreenProps {
   profile: ProfileData;
 }
 
-const OWNER_EMAIL = 'shobhasolanki230@gmail.com';
-const OWNER_PASSWORDS = ['owner2026', 'admin2026', 'shobha2026'];
+const OWNER_EMAILS = ['solankidevendra726@gmail.com', 'shobhasolanki230@gmail.com'];
+const OWNER_PASSWORDS = ['devendra2026', 'owner2026', 'admin2026', 'shobha2026'];
 
 export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
   onAuthenticated,
@@ -61,7 +61,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const themeConfig = accentThemes[accent] || accentThemes.blue;
+  const themeConfig = accentThemes[accent] || accentThemes.rose || accentThemes.blue;
 
   // Google Popup Sign In
   const handleGoogleSignIn = async () => {
@@ -71,7 +71,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const isOwnerAccount = Boolean(
-        user.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
+        user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())
       );
 
       if (isOwnerAccount) {
@@ -117,7 +117,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       const result = await signInWithPopup(auth, githubProvider);
       const user = result.user;
       const isOwnerAccount = Boolean(
-        user.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
+        user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())
       );
 
       if (isOwnerAccount) {
@@ -161,7 +161,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       const result = await signInWithPopup(auth, facebookProvider);
       const user = result.user;
       const isOwnerAccount = Boolean(
-        user.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
+        user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())
       );
 
       if (isOwnerAccount) {
@@ -198,7 +198,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       const result = await signInWithEmailAndPassword(auth, loginEmail.trim(), loginPassword);
       const user = result.user;
       const isOwnerAccount = Boolean(
-        user.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
+        user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())
       );
 
       if (isOwnerAccount) {
@@ -248,7 +248,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       });
 
       const isOwnerAccount = Boolean(
-        user.email && user.email.toLowerCase() === OWNER_EMAIL.toLowerCase()
+        user.email && OWNER_EMAILS.some(e => e.toLowerCase() === user.email?.toLowerCase())
       );
 
       if (isOwnerAccount) {
@@ -298,7 +298,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
       // Create synthetic owner user if no firebase user is logged in
       const ownerUser = auth.currentUser || ({
         uid: 'owner-session',
-        email: OWNER_EMAIL,
+        email: profile.email || 'solankidevendra726@gmail.com',
         displayName: profile.name,
         photoURL: profile.avatarUrl || null,
         emailVerified: true
@@ -447,16 +447,20 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
             {activeTab === 'user_login' && (
               <div className="space-y-4">
                 
-                {/* 1-Click Social Sign-In */}
-                <div className="space-y-2">
+                {/* 1-Click Social Sign-In with Vivid Brand Colors */}
+                <div className="space-y-2.5">
                   <button
                     id="btn-gate-google-signin"
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={loading}
-                    className="w-full py-2.5 px-4 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-semibold transition-all flex items-center justify-center gap-2.5 shadow-xs"
+                    className={`w-full py-2.5 px-4 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md active:scale-[0.99] ${
+                      themeMode === 'light'
+                        ? 'bg-white hover:bg-zinc-50 border-zinc-300 text-zinc-900'
+                        : 'bg-[#18181b] hover:bg-[#27272a] border-zinc-700 text-white'
+                    }`}
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                       <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
@@ -465,23 +469,32 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
                     <span>Continue with Google</span>
                   </button>
 
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {/* GitHub Button - Rich Brand Dark */}
                     <button
+                      id="btn-gate-github-signin"
                       type="button"
                       onClick={handleGithubSignIn}
                       disabled={loading}
-                      className="py-2 px-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                      className="py-2.5 px-3 rounded-xl bg-[#24292e] hover:bg-[#1b1f23] text-white border border-[#444c56] text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.99]"
                     >
-                      <Github className="w-3.5 h-3.5" />
+                      <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                      </svg>
                       <span>GitHub</span>
                     </button>
+
+                    {/* Facebook Button - Official Facebook Blue */}
                     <button
+                      id="btn-gate-facebook-signin"
                       type="button"
                       onClick={handleFacebookSignIn}
                       disabled={loading}
-                      className="py-2 px-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-xs font-medium transition-all flex items-center justify-center gap-1.5"
+                      className="py-2.5 px-3 rounded-xl bg-[#1877F2] hover:bg-[#166fe5] text-white border border-[#1877F2] text-xs font-semibold transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md active:scale-[0.99]"
                     >
-                      <Globe className="w-3.5 h-3.5 text-blue-500" />
+                      <svg className="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
                       <span>Facebook</span>
                     </button>
                   </div>
@@ -735,7 +748,7 @@ export const AuthGateScreen: React.FC<AuthGateScreenProps> = ({
                     onClick={handleGoogleSignIn}
                     className="w-full py-2 px-3 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-300 flex items-center justify-center gap-2 transition-colors"
                   >
-                    <span>Or Sign in with {OWNER_EMAIL}</span>
+                    <span>Or Sign in with {profile.email || OWNER_EMAILS[0]}</span>
                   </button>
                 </div>
               </div>
