@@ -11,7 +11,7 @@ export const initialProfile: ProfileData = {
     'Passionate about performance engineering, accessible UI design, clean code architectures, and developer tooling.',
     'Experienced in collaborating across cross-functional teams, driving architectural decisions, and shipping products that scale to millions of users.'
   ],
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
+  avatarUrl: '',
   location: 'Mumbai, Maharashtra - 401203',
   timezone: 'IST (UTC+5:30) • India',
   email: 'solankidevendra726@gmail.com',

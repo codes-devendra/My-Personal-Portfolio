@@ -209,19 +209,19 @@ export const Hero: React.FC<HeroProps> = ({
                 {/* Avatar & Headline inside card */}
                 <div className="flex items-center gap-4 mb-6">
                   <div className="relative">
-                    {profile.avatarUrl && profile.avatarUrl.trim() !== '' ? (
+                    {profile.avatarUrl && profile.avatarUrl.trim() !== '' && !profile.avatarUrl.includes('unsplash.com') ? (
                       <img
                         src={profile.avatarUrl.trim()}
                         alt={profile.name || 'Profile'}
                         referrerPolicy="no-referrer"
-                        className="w-16 h-16 rounded-xl object-cover border border-[#27272a]"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop';
-                        }}
+                        className="w-16 h-16 rounded-2xl object-cover border border-[#27272a] shadow-md"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-xl bg-blue-500/20 text-blue-400 font-bold text-xl flex items-center justify-center border border-[#27272a]">
-                        {profile.name?.charAt(0) || 'S'}
+                      <div 
+                        className={`w-16 h-16 rounded-2xl flex items-center justify-center font-display font-extrabold text-2xl text-white shadow-lg transition-transform hover:scale-105 bg-gradient-to-tr ${themeConfig.gradient}`}
+                        style={{ backgroundColor: themeConfig.hex }}
+                      >
+                        {profile.name?.charAt(0) || 'D'}
                       </div>
                     )}
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 border-2 border-[#111111] flex items-center justify-center">

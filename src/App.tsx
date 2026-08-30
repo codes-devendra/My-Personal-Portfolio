@@ -31,7 +31,17 @@ export default function App() {
   const [profile, setProfile] = useState<ProfileData>(() => {
     try {
       const saved = localStorage.getItem('portfolio_profile');
-      return saved ? JSON.parse(saved) : initialProfile;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.avatarUrl && (parsed.avatarUrl.includes('unsplash.com') || parsed.avatarUrl.includes('photo-'))) {
+          parsed.avatarUrl = '';
+          try {
+            localStorage.setItem('portfolio_profile', JSON.stringify({ ...initialProfile, ...parsed }));
+          } catch {}
+        }
+        return { ...initialProfile, ...parsed };
+      }
+      return initialProfile;
     } catch {
       return initialProfile;
     }

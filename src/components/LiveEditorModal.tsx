@@ -561,19 +561,22 @@ export const LiveEditorModal: React.FC<LiveEditorModalProps> = ({
                       <span>Avatar Image URL</span>
                     </label>
                     <div className="flex gap-3 items-center">
-                      <img
-                        src={formData.avatarUrl?.trim() || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop'}
-                        alt="Preview"
-                        className="w-10 h-10 rounded-xl object-cover border border-zinc-700 shrink-0"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop';
-                        }}
-                      />
+                      {formData.avatarUrl && formData.avatarUrl.trim() !== '' && !formData.avatarUrl.includes('unsplash.com') ? (
+                        <img
+                          src={formData.avatarUrl.trim()}
+                          alt="Preview"
+                          className="w-10 h-10 rounded-xl object-cover border border-zinc-700 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-500 to-red-600 text-white font-bold text-base flex items-center justify-center border border-zinc-700 shrink-0">
+                          {formData.name?.charAt(0) || 'D'}
+                        </div>
+                      )}
                       <input
                         type="url"
                         value={formData.avatarUrl}
                         onChange={(e) => handleChange('avatarUrl', e.target.value)}
-                        placeholder="https://..."
+                        placeholder="Custom image URL (or leave blank for D monogram)..."
                         className={`flex-1 px-3.5 py-2.5 rounded-xl text-xs border focus:outline-hidden transition-colors ${
                           selectedTheme === 'light'
                             ? 'bg-white border-zinc-300 text-zinc-900 focus:border-blue-500'
